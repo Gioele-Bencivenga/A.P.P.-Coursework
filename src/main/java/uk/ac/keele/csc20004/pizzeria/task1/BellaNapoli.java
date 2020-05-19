@@ -20,24 +20,69 @@ import uk.ac.keele.csc20004.pizzeria.*;
  */
 public class BellaNapoli implements Pizzeria {
 
-    private Buffer orders;
+    private OrdersList orders; // list of orders waiting to be processed
+    private OrdersList deliveryChain; // completed orders that will need to be brought to the tables by the servers
 
-    private MyCook cook1;
+    private StorageShelf sauceShelf;
+    private StorageShelf cheeseShelf;
+    private StorageShelf veggiesShelf;
+    private StorageShelf hamShelf;
+    private StorageShelf pineappleShelf;
+
+    private Thread cook;
+    private Thread refiller;
 
     public BellaNapoli() {
-        orders = new Buffer(MAX_ORDERS);
-        cook1 = new MyCook("Giorgio", this);
+        orders = new OrdersList(MAX_ORDERS);
+        deliveryChain = new OrdersList(MAX_ORDERS);
+
+        sauceShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 0);
+        cheeseShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 1);
+        veggiesShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 2);
+        hamShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 3);
+        pineappleShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 4);
+
+        cook = new Thread(new MyCook("Pierluigi", this));
+        refiller = new Thread(new Refiller("Michele", this));
     }
 
     public static void main(String[] args) {
-        // Provide a main that shows how your implementation of the pizzeria works
+        BellaNapoli bellaNapoli = new BellaNapoli();
+
+        bellaNapoli.run();
+
+        bellaNapoli.cook.start();
+    }
+
+    /**
+     * This method simulates the actual work of the pizzeria. - a number of
+     * random orders are placed - the cook keeps preparing orders as long as
+     * there are orders to be prepared
+     */
+    public void run() {
+        // we create N random orders and add them to the order list 
+        for (int i = 0; i < 5; i++) {
+            Order order = createRandomOrder();
+            placeOrder(order);
+        }
+
+    }
+
+    /**
+     * Helper function to refill a random shelf. Only one ingredient is added to
+     * the shelf at one time.
+     *
+     * @return a randomly created order (a list of pizzas of random types)(
+     */
+    private void refillRandomShelf() {
+        Random random = new Random();
     }
 
     /**
      * Helper function to create a random order. Feel free to reuse it in your
      * code.
      *
-     * @return a randomly created order (a list of pizzas of random types)(
+     * @return a randomly created order (a list of pizzas of random types)
      */
     private Order createRandomOrder() {
         Random random = new Random();
@@ -74,14 +119,14 @@ public class BellaNapoli implements Pizzeria {
      *
      * @param _order the Order to be accepted
      */
+    @Override
     public void placeOrder(Order _order) {
-        // check and see if I need to use a thread to do this stuff
         try {
             orders.add(_order);
         } catch (InterruptedException _exception) {
             System.err.println(_exception);
         }
-
+        System.out.println("Order " + _order + " arrived!");
     }
 
     /**
@@ -91,6 +136,7 @@ public class BellaNapoli implements Pizzeria {
      * @return the "next" order in the queue; in first-come-first-served
      * ordering.
      */
+    @Override
     public Order getNextOrder() {
         Order nextOrder = null;
         try {
@@ -103,14 +149,20 @@ public class BellaNapoli implements Pizzeria {
     }
 
     /**
-     * Place the order in the default "chain" for delivery. By default, this will
-     * be the "eat-in" chain, or the only one available, depending on the
+     * Place the order in the default "chain" for delivery. By default, this
+     * will be the "eat-in" chain, or the only one available, depending on the
      * scenario. This method will likely be called by a Cook.
      *
-     * @param o the Order to be delivered
+     * @param _order the Order to be delivered
      */
-    public void deliverOrder(Order o) {
-
+    @Override
+    public void deliverOrder(Order _order) {
+        try {
+            deliveryChain.add(_order);
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
+        System.out.println("Order " + _order + " added to delivery queue.");
     }
 
     /**
@@ -120,6 +172,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return the number of waiting orders
      */
+    @Override
     public int getNumOfWaitingOrders() {
         return orders.getSize();
     }
@@ -129,6 +182,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return an Ingredient of type sauce
      */
+    @Override
     public Ingredient fetchSauce() {
         return Ingredient.createSauce();
     }
@@ -138,6 +192,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return an Ingredient of type ham
      */
+    @Override
     public Ingredient fetchHam() {
         return Ingredient.createHam();
     }
@@ -147,6 +202,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return an Ingredient of type veggies
      */
+    @Override
     public Ingredient fetchVeggies() {
         return Ingredient.createVeggies();
     }
@@ -156,6 +212,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return an Ingredient of type cheese
      */
+    @Override
     public Ingredient fetchCheese() {
         return Ingredient.createCheese();
     }
@@ -165,6 +222,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return an Ingredient of type pineapple
      */
+    @Override
     public Ingredient fetchPineapple() {
         return Ingredient.createPineapple();
     }
@@ -173,6 +231,7 @@ public class BellaNapoli implements Pizzeria {
      * Puts one instance of an ingredient in the corresponding shelf. In this
      * case, in the shelf for sauce
      */
+    @Override
     public void refillSauce() {
 
     }
@@ -181,6 +240,7 @@ public class BellaNapoli implements Pizzeria {
      * Puts one instance of an ingredient in the corresponding shelf. In this
      * case, in the shelf for ham
      */
+    @Override
     public void refillHam() {
 
     }
@@ -189,6 +249,7 @@ public class BellaNapoli implements Pizzeria {
      * Puts one instance of an ingredient in the corresponding shelf. In this
      * case, in the shelf for veggies
      */
+    @Override
     public void refillVeggies() {
 
     }
@@ -197,6 +258,7 @@ public class BellaNapoli implements Pizzeria {
      * Puts one instance of an ingredient in the corresponding shelf. In this
      * case, in the shelf for cheese
      */
+    @Override
     public void refillCheese() {
 
     }
@@ -205,6 +267,7 @@ public class BellaNapoli implements Pizzeria {
      * Puts one instance of an ingredient in the corresponding shelf. In this
      * case, in the shelf for pineapple
      */
+    @Override
     public void refillPineapple() {
 
     }
@@ -215,6 +278,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return the number of sauce items in the corresponding shelf
      */
+    @Override
     public int getSauceStorageLevel() {
         return 0;
     }
@@ -225,6 +289,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return the number of ham items in the corresponding shelf
      */
+    @Override
     public int getHamStorageLevel() {
         return 0;
     }
@@ -235,6 +300,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return the number of veggies items in the corresponding shelf
      */
+    @Override
     public int getVeggiesStorageLevel() {
         return 0;
     }
@@ -245,6 +311,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return the number of cheese items in the corresponding shelf
      */
+    @Override
     public int getCheeseStorageLevel() {
         return 0;
     }
@@ -255,6 +322,7 @@ public class BellaNapoli implements Pizzeria {
      *
      * @return the number of pineapple items in the corresponding shelf
      */
+    @Override
     public int getPineappleStorageLevel() {
         return 0;
     }

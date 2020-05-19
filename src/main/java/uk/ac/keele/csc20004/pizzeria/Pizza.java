@@ -267,9 +267,9 @@ public class Pizza {
     @Override
     public String toString(){
         if(this.isMargherita()) return "margherita (tomatosauce+cheese)";
-        else if(this.isRomana()) return "romana (tomatosauce+cheese+ham)";
+        else if(this.isRomana()) return "romana (cheese+ham)";
         else if(this.isVegetarian()) return "vegetarian (tomatosauce+veggies)";
-        else if(this.isHawaiian()) return "hawaiian (tomatosauce+ham+pineapple)";
+        else if(this.isHawaiian()) return "hawaiian (ham+pineapple)";
         else return super.toString();
     }
 }
