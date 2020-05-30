@@ -23,7 +23,7 @@ public class BellaNapoli implements Pizzeria {
     private OrdersList orders; // list of orders waiting to be processed
     private OrdersList deliveryChain; // completed orders that will need to be brought to the tables by the servers
 
-    private ArrayList<StorageShelf> shelfs;
+    //private ArrayList<StorageShelf> shelves;
     private StorageShelf sauceShelf;
     private StorageShelf cheeseShelf;
     private StorageShelf veggiesShelf;
@@ -43,14 +43,16 @@ public class BellaNapoli implements Pizzeria {
         hamShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 3);
         pineappleShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 4);
 
-        shelfs.add(sauceShelf);
-        shelfs.add(cheeseShelf);
-        shelfs.add(veggiesShelf);
-        shelfs.add(hamShelf);
-        shelfs.add(pineappleShelf);
+        /*
+        shelves.set(0, sauceShelf);
+        shelves.set(1, cheeseShelf);
+        shelves.set(2, veggiesShelf);
+        shelves.set(3, hamShelf);
+        shelves.set(4, pineappleShelf);
+        */
 
-        cook = new Thread(new MyCook("Pierluigi", this));
-        supplier = new Thread(new Supplier("Michele", this));
+        cook = new Thread(new MyCook("Gesubaldo", this));
+        supplier = new Thread(new Supplier("Eustazio", this));
     }
 
     public static void main(String[] args) {
@@ -58,13 +60,15 @@ public class BellaNapoli implements Pizzeria {
 
         bellaNapoli.run();
 
+        bellaNapoli.supplier.start();
         bellaNapoli.cook.start();
     }
 
     /**
-     * This method simulates the actual work of the pizzeria. - a number of
-     * random orders are placed - the cook keeps preparing orders as long as
-     * there are orders to be prepared
+     * This method simulates the actual work of the pizzeria.
+     *
+     * for now only a number of orders are placed, cooks and suppliers will
+     * check on their own what to do and do it in their `run()` method
      */
     public void run() {
         // we create N random orders and add them to the order list 
@@ -72,17 +76,6 @@ public class BellaNapoli implements Pizzeria {
             Order order = createRandomOrder();
             placeOrder(order);
         }
-
-    }
-
-    /**
-     * Helper function to refill a random shelf. Only one ingredient is added to
-     * the shelf at one time.
-     *
-     * @return a randomly created order (a list of pizzas of random types)(
-     */
-    private void refillRandomShelf() {
-        Random random = new Random();
     }
 
     /**
@@ -185,15 +178,6 @@ public class BellaNapoli implements Pizzeria {
     }
 
     /**
-     * Get this pizzeria's shelves.
-     *
-     * @return an ArrayList<StorageShelf>
-     */
-    public ArrayList<StorageShelf> getShelfs() {
-        return shelfs;
-    }
-
-    /**
      * Take one instance of an ingredient from the corresponding shelf.
      *
      * @return an Ingredient of type sauce
@@ -205,6 +189,7 @@ public class BellaNapoli implements Pizzeria {
         } catch (InterruptedException _exception) {
             System.err.println(_exception);
         }
+        return null; // if we hit the first return statement this won't be reached
     }
 
     /**
@@ -219,6 +204,7 @@ public class BellaNapoli implements Pizzeria {
         } catch (InterruptedException _exception) {
             System.err.println(_exception);
         }
+        return null;
     }
 
     /**
@@ -233,6 +219,7 @@ public class BellaNapoli implements Pizzeria {
         } catch (InterruptedException _exception) {
             System.err.println(_exception);
         }
+        return null;
     }
 
     /**
@@ -247,6 +234,7 @@ public class BellaNapoli implements Pizzeria {
         } catch (InterruptedException _exception) {
             System.err.println(_exception);
         }
+        return null;
     }
 
     /**
@@ -261,6 +249,7 @@ public class BellaNapoli implements Pizzeria {
         } catch (InterruptedException _exception) {
             System.err.println(_exception);
         }
+        return null;
     }
 
     /**

@@ -5,6 +5,7 @@
  */
 package uk.ac.keele.csc20004.pizzeria.task1;
 
+import java.util.Random;
 import uk.ac.keele.csc20004.pizzeria.Ingredient;
 import uk.ac.keele.csc20004.pizzeria.Pizzeria;
 
@@ -22,28 +23,107 @@ public class Supplier extends Thread {
         name = _name;
         pizzeria = _pizzeria;
     }
-    
+
     /**
-     * Simulates the working of a supplier. As long as there are orders waiting to
-     * be processed the cook will prepare the next order in the list of orders.
-     * Orders are delivered at the end of the preparation.
+     * Simulates the working of a supplier.
+     *
+     * The supplier prioritises refilling shelves that are about to run out of
+     * ingredients, if no shelf is about to run out then it refills a random
+     * shelf.
      */
     @Override
-    public void run(){
- 
+    public void run() {
+        while (true) {
+            if (pizzeria.getSauceStorageLevel() < 5) {
+                refillShelf(0);
+            } else if (pizzeria.getCheeseStorageLevel() < 5) {
+                refillShelf(1);
+            } else if (pizzeria.getVeggiesStorageLevel() < 5) {
+                refillShelf(2);
+            } else if (pizzeria.getHamStorageLevel() < 5) {
+                refillShelf(3);
+            } else if (pizzeria.getPineappleStorageLevel() < 5) {
+                refillShelf(4);
+            } else {
+                refillRandomShelf();
+            }
+        }
     }
-    
+
     /**
      * Refills a shelf with 1 unit of an ingredient.
      *
-     * @param _shelf the shelf we want to refill
-     * @param _ingredient the ingredient we want to refill the shelf with
+     * 0 = sauce, 1 = cheese, 2 = veggies, 3 = ham, 4 = pineapple
+     *
+     * @param _shelfIndex the shelf we want to refill
      */
-    public void refillShelf(StorageShelf _shelf, Ingredient _ingredient, int aVariable) {
-        try {
-            _shelf.add(_ingredient);
-        } catch (InterruptedException _exception) {
-            System.err.println(_exception);
+    private void refillShelf(int _shelfIndex) {
+        switch (_shelfIndex) {
+            case 0:
+                if (pizzeria.getSauceStorageLevel() < StorageShelf.MAX_INGREDIENTS) {
+                    try {
+                        pizzeria.refillSauce();
+                        System.out.println(this.name + ": Refilled sauce, left: " + pizzeria.getSauceStorageLevel());
+
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        System.err.println(e);
+                    }
+                }
+            case 1:
+                if (pizzeria.getCheeseStorageLevel() < StorageShelf.MAX_INGREDIENTS) {
+                    try {
+                        pizzeria.refillCheese();
+                        System.out.println(this.name + ": Refilled cheese, left: " + pizzeria.getCheeseStorageLevel());
+
+                        Thread.sleep(600);
+                    } catch (InterruptedException e) {
+                        System.err.println(e);
+                    }
+                }
+            case 2:
+                if (pizzeria.getVeggiesStorageLevel() < StorageShelf.MAX_INGREDIENTS) {
+                    try {
+                        pizzeria.refillVeggies();
+                        System.out.println(this.name + ": Refilled veggies, left: " + pizzeria.getVeggiesStorageLevel());
+
+                        Thread.sleep(700);
+                    } catch (InterruptedException e) {
+                        System.err.println(e);
+                    }
+                }
+            case 3:
+                if (pizzeria.getHamStorageLevel() < StorageShelf.MAX_INGREDIENTS) {
+                    try {
+                        pizzeria.refillHam();
+                        System.out.println(this.name + ": Refilled ham, left: " + pizzeria.getHamStorageLevel());
+
+                        Thread.sleep(600);
+                    } catch (InterruptedException e) {
+                        System.err.println(e);
+                    }
+                }
+
+            case 4:
+                if (pizzeria.getPineappleStorageLevel() < StorageShelf.MAX_INGREDIENTS) {
+                    try {
+                        pizzeria.refillPineapple();
+                        System.out.println(this.name + ": Refilled pineapple, left: " + pizzeria.getPineappleStorageLevel());
+
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        System.err.println(e);
+                    }
+                }
         }
+    }
+
+    /**
+     * Refills a random shelf with 1 unit of an ingredient.
+     */
+    private void refillRandomShelf() {
+        Random random = new Random();
+
+        refillShelf(random.nextInt(5));
     }
 }
