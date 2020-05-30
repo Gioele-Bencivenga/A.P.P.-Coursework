@@ -23,6 +23,7 @@ public class BellaNapoli implements Pizzeria {
     private OrdersList orders; // list of orders waiting to be processed
     private OrdersList deliveryChain; // completed orders that will need to be brought to the tables by the servers
 
+    private ArrayList<StorageShelf> shelfs;
     private StorageShelf sauceShelf;
     private StorageShelf cheeseShelf;
     private StorageShelf veggiesShelf;
@@ -30,7 +31,7 @@ public class BellaNapoli implements Pizzeria {
     private StorageShelf pineappleShelf;
 
     private Thread cook;
-    private Thread refiller;
+    private Thread supplier;
 
     public BellaNapoli() {
         orders = new OrdersList(MAX_ORDERS);
@@ -42,8 +43,14 @@ public class BellaNapoli implements Pizzeria {
         hamShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 3);
         pineappleShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 4);
 
+        shelfs.add(sauceShelf);
+        shelfs.add(cheeseShelf);
+        shelfs.add(veggiesShelf);
+        shelfs.add(hamShelf);
+        shelfs.add(pineappleShelf);
+
         cook = new Thread(new MyCook("Pierluigi", this));
-        refiller = new Thread(new Refiller("Michele", this));
+        supplier = new Thread(new Supplier("Michele", this));
     }
 
     public static void main(String[] args) {
@@ -178,13 +185,26 @@ public class BellaNapoli implements Pizzeria {
     }
 
     /**
+     * Get this pizzeria's shelves.
+     *
+     * @return an ArrayList<StorageShelf>
+     */
+    public ArrayList<StorageShelf> getShelfs() {
+        return shelfs;
+    }
+
+    /**
      * Take one instance of an ingredient from the corresponding shelf.
      *
      * @return an Ingredient of type sauce
      */
     @Override
     public Ingredient fetchSauce() {
-        return Ingredient.createSauce();
+        try {
+            return sauceShelf.poll();
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
     }
 
     /**
@@ -194,7 +214,11 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public Ingredient fetchHam() {
-        return Ingredient.createHam();
+        try {
+            return hamShelf.poll();
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
     }
 
     /**
@@ -204,7 +228,11 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public Ingredient fetchVeggies() {
-        return Ingredient.createVeggies();
+        try {
+            return veggiesShelf.poll();
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
     }
 
     /**
@@ -214,7 +242,11 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public Ingredient fetchCheese() {
-        return Ingredient.createCheese();
+        try {
+            return cheeseShelf.poll();
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
     }
 
     /**
@@ -224,7 +256,11 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public Ingredient fetchPineapple() {
-        return Ingredient.createPineapple();
+        try {
+            return pineappleShelf.poll();
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
     }
 
     /**
@@ -233,7 +269,11 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public void refillSauce() {
-
+        try {
+            sauceShelf.add(Ingredient.createSauce());
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
     }
 
     /**
@@ -242,7 +282,11 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public void refillHam() {
-
+        try {
+            hamShelf.add(Ingredient.createHam());
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
     }
 
     /**
@@ -251,7 +295,11 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public void refillVeggies() {
-
+        try {
+            veggiesShelf.add(Ingredient.createVeggies());
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
     }
 
     /**
@@ -260,7 +308,11 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public void refillCheese() {
-
+        try {
+            cheeseShelf.add(Ingredient.createCheese());
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
     }
 
     /**
@@ -269,7 +321,11 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public void refillPineapple() {
-
+        try {
+            pineappleShelf.add(Ingredient.createPineapple());
+        } catch (InterruptedException _exception) {
+            System.err.println(_exception);
+        }
     }
 
     /**
@@ -280,7 +336,7 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public int getSauceStorageLevel() {
-        return 0;
+        return sauceShelf.getSize();
     }
 
     /**
@@ -291,7 +347,7 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public int getHamStorageLevel() {
-        return 0;
+        return hamShelf.getSize();
     }
 
     /**
@@ -302,7 +358,7 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public int getVeggiesStorageLevel() {
-        return 0;
+        return veggiesShelf.getSize();
     }
 
     /**
@@ -313,7 +369,7 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public int getCheeseStorageLevel() {
-        return 0;
+        return cheeseShelf.getSize();
     }
 
     /**
@@ -324,6 +380,6 @@ public class BellaNapoli implements Pizzeria {
      */
     @Override
     public int getPineappleStorageLevel() {
-        return 0;
+        return pineappleShelf.getSize();
     }
 }

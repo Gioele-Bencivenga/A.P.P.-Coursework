@@ -33,6 +33,20 @@ public class MyCook extends Thread implements Cook {
     }
 
     /**
+     * Simulates the working of a cook. As long as there are orders waiting to
+     * be processed the cook will prepare the next order in the list of orders.
+     * Orders are delivered at the end of the preparation.
+     */
+    @Override
+    public void run() {
+        while (true) {
+            while (pizzeria.getNumOfWaitingOrders() > 0) {
+                prepareOrder(pizzeria.getNextOrder());
+            }
+        }
+    }
+
+    /**
      * Simulate the cooking of a pizza by sleeping for the specified amount of
      * time. It is a private function as a Cook works on Orders not on single
      * Pizzas
@@ -88,17 +102,5 @@ public class MyCook extends Thread implements Cook {
         }
 
         pizzeria.deliverOrder(_order);
-    }
-
-    @Override
-    public void run() {
-        while (true) {
-            // as long as there are orders waiting to be processed the cook will
-            // prepare the next order in the list of orders
-            // orders are delivered at the end of the preparation
-            while (pizzeria.getNumOfWaitingOrders() > 0) {
-                prepareOrder(pizzeria.getNextOrder());
-            }
-        }
     }
 }
