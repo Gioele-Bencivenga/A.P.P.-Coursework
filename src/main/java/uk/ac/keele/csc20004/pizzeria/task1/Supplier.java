@@ -16,8 +16,8 @@ import uk.ac.keele.csc20004.pizzeria.Pizzeria;
  */
 public class Supplier extends Thread {
 
-    private final String name; // the supplier's name
-    private final Pizzeria pizzeria; // the pizzeria the supplier supplies
+    protected final String name; // the supplier's name
+    protected final Pizzeria pizzeria; // the pizzeria the supplier supplies
 
     public Supplier(String _name, Pizzeria _pizzeria) {
         name = _name;

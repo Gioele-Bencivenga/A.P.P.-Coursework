@@ -3,21 +3,29 @@ package uk.ac.keele.csc20004.pizzeria.task1;
 import java.util.LinkedList;
 import java.util.Queue;
 import uk.ac.keele.csc20004.pizzeria.Order;
+import static uk.ac.keele.csc20004.pizzeria.task1.DeliveryChain.MAX_DELIVERY_WAITS;
 
 /**
  * A spin on the Buffer class seen in the practicals. Basically a queue
  * implemented with a linked list.
  *
- * @author Marco Ortolani, Repurposed by 18016286.
+ * @author Marco Ortolani, Repurposed by Gioele Bencivenga.
  */
 public class OrdersList {
 
-    private Queue<Order> list;
-    private int size;
+    protected Queue<Order> list;
+    protected int size;
+
+    /**
+     * Whether the chain has reached maximum capacity or not.
+     */
+    public boolean isFull;
 
     public OrdersList(int _size) {
-        this.list = new LinkedList<>();
-        this.size = _size;
+        list = new LinkedList<>();
+        size = _size;
+
+        isFull = false;
     }
 
     /**
@@ -26,10 +34,12 @@ public class OrdersList {
      * @param _order the order to add to the queue
      */
     public synchronized void add(Order _order) throws InterruptedException {
-        while (list.size() >= size) {
+        while (getSize() == size) {
+            isFull = true;
             wait();
         }
         list.add(_order);
+
         notifyAll();
     }
 
@@ -40,10 +50,16 @@ public class OrdersList {
      * @return the head of the queue or null if the queue is empty
      */
     public synchronized Order poll() throws InterruptedException {
-        while (list.size() == 0) {
+        while (list.isEmpty()) {
             wait();
         }
+
+        while (isFull) { // if the chain is full and we poll then the chain won't be full anymores
+            isFull = false;
+        }
+
         Order order = list.poll();
+
         notifyAll();
         return order;
     }

@@ -6,6 +6,7 @@ package uk.ac.keele.csc20004.pizzeria.task1;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Timer;
 import uk.ac.keele.csc20004.pizzeria.*;
 
 /**
@@ -21,7 +22,7 @@ import uk.ac.keele.csc20004.pizzeria.*;
 public class BellaNapoli implements Pizzeria {
 
     private OrdersList orders; // list of orders waiting to be processed
-    private OrdersList deliveryChain; // completed orders that will need to be brought to the tables by the servers
+    private DeliveryChain deliveryChain; // completed orders that will need to be brought to the tables by the servers
 
     //private ArrayList<StorageShelf> shelves;
     private StorageShelf sauceShelf;
@@ -32,10 +33,11 @@ public class BellaNapoli implements Pizzeria {
 
     private Thread cook;
     private Thread supplier;
+    private Thread consumer;
 
     public BellaNapoli() {
         orders = new OrdersList(MAX_ORDERS);
-        deliveryChain = new OrdersList(MAX_ORDERS);
+        deliveryChain = new DeliveryChain();
 
         sauceShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 0);
         cheeseShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 1);
@@ -49,10 +51,10 @@ public class BellaNapoli implements Pizzeria {
         shelves.set(2, veggiesShelf);
         shelves.set(3, hamShelf);
         shelves.set(4, pineappleShelf);
-        */
-
+         */
         cook = new Thread(new MyCook("Gesubaldo", this));
         supplier = new Thread(new Supplier("Eustazio", this));
+        consumer = new Thread(new OrderConsumer("Teofrasto", deliveryChain));
     }
 
     public static void main(String[] args) {
@@ -62,6 +64,7 @@ public class BellaNapoli implements Pizzeria {
 
         bellaNapoli.supplier.start();
         bellaNapoli.cook.start();
+        bellaNapoli.consumer.start();
     }
 
     /**
@@ -113,9 +116,10 @@ public class BellaNapoli implements Pizzeria {
     }
 
     /**
-     * Accept an order and store it in the default order queue. By default, this
-     * will be the "eat-in" queue, or the only one available, depending on the
-     * scenario.
+     * Accept an order and store it in the default order queue.
+     *
+     * By default, this will be the "eat-in" queue, or the only one available,
+     * depending on the scenario.
      *
      * @param _order the Order to be accepted
      */
@@ -130,8 +134,10 @@ public class BellaNapoli implements Pizzeria {
     }
 
     /**
-     * Fetch an order from the default order queue. By default, this will be the
-     * "eat-in" queue, or the only one available, depending on the scenario.
+     * Fetch an order from the default order queue.
+     *
+     * By default, this will be the "eat-in" queue, or the only one available,
+     * depending on the scenario.
      *
      * @return the "next" order in the queue; in first-come-first-served
      * ordering.
@@ -149,9 +155,9 @@ public class BellaNapoli implements Pizzeria {
     }
 
     /**
-     * Place the order in the default "chain" for delivery. By default, this
-     * will be the "eat-in" chain, or the only one available, depending on the
-     * scenario. This method will likely be called by a Cook.
+     * Place the order in the default "chain" for delivery.
+     * By default, this will be the "eat-in" chain, or the only one available,
+     * depending on the scenario. This method will likely be called by a Cook.
      *
      * @param _order the Order to be delivered
      */
@@ -167,8 +173,10 @@ public class BellaNapoli implements Pizzeria {
 
     /**
      * Get the number of orders still to be processed in the default order
-     * queue. By default, this will be the "eat-in" queue, or the only one
-     * available, depending on the scenario.
+     * queue.
+     *
+     * By default, this will be the "eat-in" queue, or the only one available,
+     * depending on the scenario.
      *
      * @return the number of waiting orders
      */
