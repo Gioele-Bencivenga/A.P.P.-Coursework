@@ -156,6 +156,7 @@ public class BellaNapoli implements Pizzeria {
 
     /**
      * Place the order in the default "chain" for delivery.
+     *
      * By default, this will be the "eat-in" chain, or the only one available,
      * depending on the scenario. This method will likely be called by a Cook.
      *
