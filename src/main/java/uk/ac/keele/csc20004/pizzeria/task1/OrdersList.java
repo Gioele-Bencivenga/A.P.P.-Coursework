@@ -54,7 +54,7 @@ public class OrdersList {
             wait();
         }
 
-        while (isFull) { // if the chain is full and we poll then the chain won't be full anymores
+        while (isFull) { // if the chain is full and we poll then the chain won't be full anymore
             isFull = false;
         }
 

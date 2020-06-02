@@ -5,6 +5,7 @@
  */
 package uk.ac.keele.csc20004.pizzeria.task1;
 
+import uk.ac.keele.csc20004.pizzeria.task2.MyPizzeria;
 import java.util.Random;
 import uk.ac.keele.csc20004.pizzeria.*;
 
@@ -26,26 +27,28 @@ public class Supplier extends Thread {
     /**
      * Simulates the working of a supplier.
      *
-     * The supplier prioritises refilling shelves that are about to run out of
-     * ingredients, if no shelf is about to run out then it refills a random
-     * shelf.
+     * The supplier refills shelves that are about to run out first, then it
+     * refills shelves at random.
      */
     @Override
     public void run() {
         while (true) {
-            if (pizzeria.getSauceStorageLevel() < 5) {
+            while (pizzeria.getSauceStorageLevel() < 3) {
                 refillShelf(0);
-            } else if (pizzeria.getCheeseStorageLevel() < 5) {
-                refillShelf(1);
-            } else if (pizzeria.getVeggiesStorageLevel() < 5) {
-                refillShelf(2);
-            } else if (pizzeria.getHamStorageLevel() < 5) {
-                refillShelf(3);
-            } else if (pizzeria.getPineappleStorageLevel() < 5) {
-                refillShelf(4);
-            } else {
-                refillRandomShelf();
             }
+            while (pizzeria.getCheeseStorageLevel() < 3) {
+                refillShelf(1);
+            }
+            while (pizzeria.getVeggiesStorageLevel() < 3) {
+                refillShelf(2);
+            }
+            while (pizzeria.getHamStorageLevel() < 3) {
+                refillShelf(3);
+            }
+            while (pizzeria.getPineappleStorageLevel() < 3) {
+                refillShelf(4);
+            }
+            refillRandomShelf();
         }
     }
 
@@ -54,10 +57,10 @@ public class Supplier extends Thread {
      *
      * 0 = sauce, 1 = cheese, 2 = veggies, 3 = ham, 4 = pineapple
      *
-     * @param _shelfIndex the shelf we want to refill
+     * @param s the shelf we want to refill
      */
-    private void refillShelf(int _shelfIndex) {
-        switch (_shelfIndex) {
+    private void refillShelf(int s) {
+        switch (s) {
             case 0:
                 if (pizzeria.getSauceStorageLevel() < StorageShelf.MAX_INGREDIENTS) {
                     try {
@@ -75,7 +78,7 @@ public class Supplier extends Thread {
                         pizzeria.refillCheese();
                         System.out.println(this.name + ": Refilled cheese, left: " + pizzeria.getCheeseStorageLevel());
 
-                        Thread.sleep(600);
+                        Thread.sleep(700);
                     } catch (InterruptedException e) {
                         System.err.println(e);
                     }
@@ -86,7 +89,7 @@ public class Supplier extends Thread {
                         pizzeria.refillVeggies();
                         System.out.println(this.name + ": Refilled veggies, left: " + pizzeria.getVeggiesStorageLevel());
 
-                        Thread.sleep(700);
+                        Thread.sleep(800);
                     } catch (InterruptedException e) {
                         System.err.println(e);
                     }

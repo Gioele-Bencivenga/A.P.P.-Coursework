@@ -4,27 +4,23 @@
  * **********************/
 package uk.ac.keele.csc20004.pizzeria.task2;
 
-import uk.ac.keele.csc20004.pizzeria.MyPizzeria;
 import java.util.ArrayList;
 import java.util.Random;
-import uk.ac.keele.csc20004.pizzeria.Ingredient;
-import uk.ac.keele.csc20004.pizzeria.Order;
-import uk.ac.keele.csc20004.pizzeria.Pizza;
-import uk.ac.keele.csc20004.pizzeria.Pizzeria;
+import uk.ac.keele.csc20004.pizzeria.*;
 import uk.ac.keele.csc20004.pizzeria.task1.*;
 
 /**
- * Complete the code relative to Task2 here. Feel free to add more
- * classes/interfaces if necessary.
+ * Code relative to Task2.
  *
- * Replace this comment with your own.
+ * A potential issue with concurrent access to the shelves is the cooks
+ * accessing the shelves at the same time. By having each shelf as a queue that
+ * has synchronized `add()` and `poll()` methods it is not possible for two
+ * threads to access a shelf at the same time as another thread. Additionally,
+ * thanks to the `notifyAll()` call at the end of the methods a cook accessing a
+ * shelf is able to wake up the other threads that are waiting as soon as it's
+ * done.
  *
- * Include description of your approach to resource contention (the cooks are
- * competing for access to the shared shelves). Provide a couple of (short)
- * sentences to discuss: - what are the potential issues due to concurrent
- * access to the shelves - how you managed the contention
- *
- * @author 18016286
+ * @author Gioele Bencivenga
  */
 public class PizzaExpress implements MyPizzeria {
 
@@ -53,7 +49,8 @@ public class PizzaExpress implements MyPizzeria {
     private Thread eatInCook;
     private Thread takeAwayCook;
     private Thread supplier;
-    private Thread consumer;
+    private Thread eatInConsumer;
+    private Thread takeAwayConsumer;
 
     public PizzaExpress() {
         // orders lists
@@ -72,10 +69,11 @@ public class PizzaExpress implements MyPizzeria {
         pineappleShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 4);
 
         // people
-        eatInCook = new Thread(new MyCook("COOK1", this, 1));
-        takeAwayCook = new Thread(new MyCook("COOK2", this, 2));
+        eatInCook = new Thread(new MyCook("COOK_EATIN", this, 1));
+        takeAwayCook = new Thread(new MyCook("COOK_TAKEAWAY", this, 2));
         supplier = new Thread(new Supplier("SUPPLIER", this));
-        consumer = new Thread(new OrderConsumer("CONSUMER", eatInChain));
+        eatInConsumer = new Thread(new OrderConsumer("CONSUMER_EATIN", eatInChain));
+        takeAwayConsumer = new Thread(new OrderConsumer("CONSUMER_TAKEAWAY", takeAwayChain));
     }
 
     public static void main(String[] args) {
@@ -92,19 +90,22 @@ public class PizzaExpress implements MyPizzeria {
      * method.
      */
     public void run() {
+        // starting the pizzeria workers and consumers so they can start fulfilling their role
+        supplier.start();
+        eatInCook.start();
+        takeAwayCook.start();
+        eatInConsumer.start();
+        takeAwayConsumer.start();
+
         int nOfOrders = 5; // the number of random orders we want to create
 
-        for (int i = 0; i < nOfOrders; i++) { // loop that creates and places the orders in the chain
-            Order order = createRandomOrder();
-            placeOrder(order);
+        // creating and placing the orders in the chains
+        for (int i = 0; i < nOfOrders; i++) {
+            Order eatInOrder = createRandomOrder();
+            Order takeAwayOrder = createRandomOrder();
+            placeOrder(eatInOrder);
+            placeTakeAwayOrder(takeAwayOrder);
         }
-
-        // starting the pizzeria workers so they can start fulfilling their role
-        /*
-        supplier.start();
-        cook.start();
-        consumer.start();
-         */
     }
 
     /**
@@ -146,16 +147,16 @@ public class PizzaExpress implements MyPizzeria {
      * will be the "eat-in" queue, or the only one available, depending on the
      * scenario.
      *
-     * @param _order the Order to be accepted
+     * @param o the Order to be accepted
      */
     @Override
-    public void placeOrder(Order _order) {
+    public void placeOrder(Order o) {
         try {
-            eatInOrders.add(_order);
+            eatInOrders.add(o);
         } catch (InterruptedException _exception) {
             System.err.println(_exception);
         }
-        System.out.println("Order " + _order + " arrived!");
+        System.out.println("Order " + o + " arrived in the EAT IN queue!");
     }
 
     /**
@@ -171,7 +172,7 @@ public class PizzaExpress implements MyPizzeria {
         } catch (InterruptedException _exception) {
             System.err.println(_exception);
         }
-        System.out.println("Order " + o + " arrived!");
+        System.out.println("Order " + o + " arrived in the TAKE AWAY queue!");
     }
 
     /**

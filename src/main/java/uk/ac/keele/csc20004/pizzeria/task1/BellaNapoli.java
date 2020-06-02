@@ -4,20 +4,20 @@
  * **********************/
 package uk.ac.keele.csc20004.pizzeria.task1;
 
+import uk.ac.keele.csc20004.pizzeria.task2.MyPizzeria;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import uk.ac.keele.csc20004.pizzeria.*;
 
 /**
- * Complete the code relative to Task1 here. Feel free to add more
- * classes/interfaces if necessary.
+ * Code relative to Task1.
  *
  * I looked at ArrayBlockingQueue and ConcurrentLinkedQueue as the data
  * structure for holding the orders, however I then decided to use something
  * we've already seen in the lab practicals: the Buffer class provided by Marco.
  *
- * @author 18016286
+ * @author Gioele Bencivenga
  */
 public class BellaNapoli implements MyPizzeria {
 
@@ -63,17 +63,18 @@ public class BellaNapoli implements MyPizzeria {
      * method.
      */
     public void run() {
-        int nOfOrders = 5; // the number of random orders we want to create
-
-        for (int i = 0; i < nOfOrders; i++) { // loop that creates and places the orders in the chain
-            Order order = createRandomOrder();
-            placeOrder(order);
-        }
-
         // starting the pizzeria workers so they can start fulfilling their role
         supplier.start();
         cook.start();
         consumer.start();
+
+        int nOfOrders = 5; // the number of random orders we want to create
+
+        // creating and placing the orders in the chain
+        for (int i = 0; i < nOfOrders; i++) {
+            Order order = createRandomOrder();
+            placeOrder(order);
+        }
     }
 
     /**

@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.keele.csc20004.pizzeria;
+package uk.ac.keele.csc20004.pizzeria.task2;
 
 import uk.ac.keele.csc20004.pizzeria.Ingredient;
 import uk.ac.keele.csc20004.pizzeria.Order;
+import uk.ac.keele.csc20004.pizzeria.Order;
+import uk.ac.keele.csc20004.pizzeria.Pizzeria;
 
 /**
  * A slightly less basic interface for a pizzeria. See

@@ -37,17 +37,20 @@ public class OrderConsumer extends Thread {
     /**
      * Simulates the consuming of a consumer.
      *
-     * The consumer polls the head of the chain he is consuming every x seconds
+     * The consumer polls the head of the chain he is consuming every x seconds,
+     * as long as the chain contains 1 or more elements.
      */
     @Override
     public void run() {
         while (true) {
-            try {
-                Thread.sleep(new Random().nextInt(chain.MAX_DELIVERY_TIME));
-                System.out.println(name + ": Consumed order " + chain.poll());
-            } catch (InterruptedException e) {
-                System.err.println(e);
-            }
+            //while (chain.getSize() > 0) {
+                try {
+                    Thread.sleep(new Random().nextInt(chain.MAX_DELIVERY_TIME));
+                    System.out.println(name + ": Consumed order " + chain.poll());
+                } catch (InterruptedException e) {
+                    System.err.println(e);
+                }
+            //}
         }
     }
 }
