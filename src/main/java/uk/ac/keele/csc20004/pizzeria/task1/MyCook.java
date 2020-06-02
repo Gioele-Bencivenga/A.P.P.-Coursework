@@ -17,8 +17,16 @@ import uk.ac.keele.csc20004.pizzeria.*;
 public class MyCook extends Thread implements Cook {
 
     private final String name; // the cook's name
-    private final Pizzeria pizzeria; // the pizzeria to which the cook belongs
-    //private Buffer orderList; // the order list from where the cook should be pulling orders from
+    private final MyPizzeria pizzeria; // the pizzeria to which the cook belongs
+
+    /**
+     * Specifies the cook's behaviour regarding preparing orders.
+     *
+     * 0 = the cook prepares both eat in and take away orders. 1 = the cook
+     * prepares orders from the primary (eat in) chain. 2 = the cook prepares
+     * orders from the secondary (take away) chain.
+     */
+    protected int cookType;
 
     /**
      * A bare constructor, just to initialise the internal variables.
@@ -26,10 +34,10 @@ public class MyCook extends Thread implements Cook {
      * @param _name the name of the cook (just used for printing purposes)
      * @param _pizzeria the pizzeria the cook belongs to
      */
-    public MyCook(String _name, Pizzeria _pizzeria) {
+    public MyCook(String _name, MyPizzeria _pizzeria, int _cookType) {
         name = _name;
         pizzeria = _pizzeria;
-        //orderList = _orderList; not used for now
+        cookType = _cookType;
     }
 
     /**
@@ -40,8 +48,15 @@ public class MyCook extends Thread implements Cook {
     @Override
     public void run() {
         while (true) {
-            while (pizzeria.getNumOfWaitingOrders() > 0) {
-                prepareOrder(pizzeria.getNextOrder());
+            while (cookType == 1) {
+                while (pizzeria.getNumOfWaitingOrders() > 0) {
+                    prepareOrder(pizzeria.getNextOrder());
+                }
+            }
+            while (cookType == 2) {
+                while (pizzeria.getNumOfWaitingTakeAwayOrders() > 0) {
+                    prepareOrder(pizzeria.getNextTakeAwayOrder());
+                }
             }
         }
     }
@@ -71,12 +86,12 @@ public class MyCook extends Thread implements Cook {
      * ingredients. This method simulates the fetching of ingredients (just stub
      * methods in SamplePizzeria) and calls cookPizza()
      *
-     * @param _order the order to be processed
+     * @param o the order to be processed
      */
     @Override
-    public void prepareOrder(Order _order) {
-        System.out.println(name + ": begins working on order " + _order);
-        for (Pizza pizza : _order) {
+    public void prepareOrder(Order o) {
+        System.out.println(name + ": begins working on order " + o);
+        for (Pizza pizza : o) {
             System.out.println(name + ": begins assembling pizza " + pizza);
             for (Ingredient i : pizza.getIngredients()) {
                 System.out.println(name + ": trying to fetch " + i);
@@ -101,6 +116,17 @@ public class MyCook extends Thread implements Cook {
             cookPizza(pizza);
         }
 
-        pizzeria.deliverOrder(_order);
+        if (cookType == 1) {
+            pizzeria.deliverOrder(o);
+        } else if (cookType == 2) {
+            pizzeria.deliverTakeAwayOrder(o);
+        }
+        /*
+        Should I modify Order by creating MyOrder which also has orderType to 
+        indentify if it's a takeaway or eatin order?
+        It would be very useful to deliver orders for task3, otherwise cooks 
+        will have to remember from which chain the current order came from.
+        Check on the discussion board to see if marco answered.
+         */
     }
 }

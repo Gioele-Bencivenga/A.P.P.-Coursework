@@ -6,8 +6,7 @@
 package uk.ac.keele.csc20004.pizzeria.task1;
 
 import java.util.Random;
-import uk.ac.keele.csc20004.pizzeria.Ingredient;
-import uk.ac.keele.csc20004.pizzeria.Pizzeria;
+import uk.ac.keele.csc20004.pizzeria.*;
 
 /**
  * Like MyCook, but with shelves instead of pizzas.
@@ -17,9 +16,9 @@ import uk.ac.keele.csc20004.pizzeria.Pizzeria;
 public class Supplier extends Thread {
 
     protected final String name; // the supplier's name
-    protected final Pizzeria pizzeria; // the pizzeria the supplier supplies
+    protected final MyPizzeria pizzeria; // the pizzeria the supplier supplies
 
-    public Supplier(String _name, Pizzeria _pizzeria) {
+    public Supplier(String _name, MyPizzeria _pizzeria) {
         name = _name;
         pizzeria = _pizzeria;
     }

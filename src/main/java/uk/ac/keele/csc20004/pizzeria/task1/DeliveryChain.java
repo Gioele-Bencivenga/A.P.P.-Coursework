@@ -29,6 +29,9 @@ public class DeliveryChain extends OrdersList {
      */
     public static final int MAX_DELIVERY_WAITS = 5;
 
+    /**
+     * Instantiates the DeliveryChain with a size of `MAX_DELIVERY_WAITS`.
+     */
     public DeliveryChain() {
         super(MAX_DELIVERY_WAITS);
     }

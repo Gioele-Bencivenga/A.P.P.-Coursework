@@ -44,7 +44,7 @@ public class OrderConsumer extends Thread {
         while (true) {
             try {
                 Thread.sleep(new Random().nextInt(chain.MAX_DELIVERY_TIME));
-                System.out.println("Consumed order " + chain.poll());
+                System.out.println(name + ": Consumed order " + chain.poll());
             } catch (InterruptedException e) {
                 System.err.println(e);
             }

@@ -19,12 +19,11 @@ import uk.ac.keele.csc20004.pizzeria.*;
  *
  * @author 18016286
  */
-public class BellaNapoli implements Pizzeria {
+public class BellaNapoli implements MyPizzeria {
 
     private OrdersList orders; // list of orders waiting to be processed
     private DeliveryChain deliveryChain; // completed orders that will need to be brought to the tables by the servers
 
-    //private ArrayList<StorageShelf> shelves;
     private StorageShelf sauceShelf;
     private StorageShelf cheeseShelf;
     private StorageShelf veggiesShelf;
@@ -45,40 +44,36 @@ public class BellaNapoli implements Pizzeria {
         hamShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 3);
         pineappleShelf = new StorageShelf(StorageShelf.MAX_INGREDIENTS, 4);
 
-        /*
-        shelves.set(0, sauceShelf);
-        shelves.set(1, cheeseShelf);
-        shelves.set(2, veggiesShelf);
-        shelves.set(3, hamShelf);
-        shelves.set(4, pineappleShelf);
-         */
-        cook = new Thread(new MyCook("Gesubaldo", this));
+        cook = new Thread(new MyCook("Gesubaldo", this, 1));
         supplier = new Thread(new Supplier("Eustazio", this));
         consumer = new Thread(new OrderConsumer("Teofrasto", deliveryChain));
     }
 
     public static void main(String[] args) {
-        BellaNapoli bellaNapoli = new BellaNapoli();
+        BellaNapoli pizzeria = new BellaNapoli();
 
-        bellaNapoli.run();
-
-        bellaNapoli.supplier.start();
-        bellaNapoli.cook.start();
-        bellaNapoli.consumer.start();
+        pizzeria.run();
     }
 
     /**
      * This method simulates the actual work of the pizzeria.
      *
-     * for now only a number of orders are placed, cooks and suppliers will
-     * check on their own what to do and do it in their `run()` method
+     * for now only a number of orders are placed, cooks, suppliers and
+     * consumers will check on their own what to do and do it in their `run()`
+     * method.
      */
     public void run() {
-        // we create N random orders and add them to the order list 
-        for (int i = 0; i < 5; i++) {
+        int nOfOrders = 5; // the number of random orders we want to create
+
+        for (int i = 0; i < nOfOrders; i++) { // loop that creates and places the orders in the chain
             Order order = createRandomOrder();
             placeOrder(order);
         }
+
+        // starting the pizzeria workers so they can start fulfilling their role
+        supplier.start();
+        cook.start();
+        consumer.start();
     }
 
     /**
@@ -379,5 +374,25 @@ public class BellaNapoli implements Pizzeria {
     @Override
     public int getPineappleStorageLevel() {
         return pineappleShelf.getSize();
+    }
+
+    @Override
+    public void placeTakeAwayOrder(Order o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Order getNextTakeAwayOrder() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void deliverTakeAwayOrder(Order o) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getNumOfWaitingTakeAwayOrders() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
